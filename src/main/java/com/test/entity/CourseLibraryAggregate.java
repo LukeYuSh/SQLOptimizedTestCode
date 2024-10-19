@@ -5,22 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Course {
+public class CourseLibraryAggregate{
 
     private Long id;
     private String name;
-    private Long coachId;
-    private String kind;
-    private Integer duration;
+    private String coachName;
     private String image;
-    private Date createTime;
-    private Date updateTime;
-    private Boolean deleted;
+    private String kind;
+    private Integer hotIndex;
+    private Boolean complete;
+    private Long gId;
+    private Boolean locking;
 
 }

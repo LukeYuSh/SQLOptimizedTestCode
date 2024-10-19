@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.dao.UserCourseDao">
+
+    <resultMap id="dataMap" type="com.test.entity.UserCourse">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="coach_id" property="coachId"/>
+        <result column="coach_name" property="coachName"/>
+    </resultMap>
+
+    <insert id="batchInsertUserCourse" parameterType="com.test.entity.UserCourse">
+        INSERT INTO user_course(`user_id`, `course_id`,`coach_id`, `coach_name`)VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userId},#{item.courseId},#{item.coachId},#{item.coachName})
+        </foreach>
+    </insert>
+
+    <select id="selectCourseLibrary" resultType="com.test.entity.CourseLibraryAggregate">
+        SELECT
+        c.id,
+        c.`name`,
+        co.`name` AS coachName,
+        c.image,
+        c.kind,
+        IF( c1.course_user_count is null ,0, c1.course_user_count) hotIndex,
+        IF( uc.complete is null ,0, uc.complete) complete,
+        g.id as gId,
+        IF( g.id is not null ,false, true) as locking
+        FROM course c
+        LEFT JOIN (
+        SELECT COUNT(1) as user_count,
+        uc.course_id,
+        uc.coach_name,
+        <![CDATA[ (uc.course_duration*0.9)<=max(r.duration) as complete]]>
+        FROM user_course_result r
+        LEFT JOIN user_course uc ON (r.user_course_id=uc.id)
+        WHERE uc.user_id= #{userId}
+        GROUP BY uc.course_id
+        ) uc ON (uc.course_id=c.id)
+        LEFT JOIN (
+        SELECT COUNT(*) as course_user_count ,
+        course_id
+        FROM user_course r
+        GROUP BY course_id
+        ) AS c1 ON (c.id=c1.course_id)
+        LEFT JOIN coach AS co ON ( c.coach_id = co.id )
+        LEFT JOIN (
+        SELECT *,
+        gift->'$.courseId' as course_id
+        FROM gift_take
+        WHERE user_id=#{userId} AND expire_time>now()
+        ) AS g ON(g.course_id=c.id)
+        ORDER BY c1.course_user_count DESC
+    </select>
+
+</mapper>

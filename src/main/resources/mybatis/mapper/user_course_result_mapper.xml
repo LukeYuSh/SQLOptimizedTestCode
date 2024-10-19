@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.dao.UserCourseResultDao">
+
+    <resultMap id="dataMap" type="com.test.entity.UserCourseResult">
+        <id column="id" property="id"/>
+        <result column="user_course_id" property="userCourseId"/>
+        <result column="score" property="score"/>
+        <result column="duration" property="duration"/>
+        <result column="extras" property="extras"/>
+    </resultMap>
+
+    <insert id="batchInsertUserCourseResult" parameterType="com.test.entity.UserCourseResult">
+        INSERT INTO user_course_result(`user_course_id`, `score`,`duration`, `extras`)VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userCourseId},#{item.score},#{item.duration},#{item.extras})
+        </foreach>
+    </insert>
+
+</mapper>

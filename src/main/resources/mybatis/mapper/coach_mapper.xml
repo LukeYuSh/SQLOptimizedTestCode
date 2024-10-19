@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.dao.CoachDao">
+
+    <resultMap id="dataMap" type="com.test.entity.Coach">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="photo" property="photo"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="batchInsert" parameterType="com.test.entity.Coach">
+        INSERT INTO coach(`name`, `photo`, `create_time`, `update_time`)VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.name},#{item.photo},now(),now())
+        </foreach>
+    </insert>
+
+</mapper>
